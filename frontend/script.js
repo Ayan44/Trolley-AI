@@ -391,6 +391,9 @@ function setupControls() {
         });
     });
 
+    // Custom dropdown functionality for deontological variant
+    setupCustomDropdown();
+
     deonSelect.addEventListener("change", () => {
         scenario.deon_variant = deonSelect.value;
     });
@@ -538,6 +541,56 @@ async function runCompare() {
     } catch (err) {
         console.error(err);
         alert("Müqayisə sorğusu zamanı xəta baş verdi. Konsolu yoxla.");
+    }
+}
+
+function setupCustomDropdown() {
+    const customSelect = document.getElementById('deon-variant-select');
+    const trigger = customSelect.querySelector('.custom-select-trigger');
+    const options = customSelect.querySelectorAll('.custom-option');
+    const hiddenInput = document.getElementById('deon-variant');
+    const selectText = customSelect.querySelector('.custom-select-text');
+
+    // Toggle dropdown
+    trigger.addEventListener('click', function() {
+        customSelect.classList.toggle('open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!customSelect.contains(e.target)) {
+            customSelect.classList.remove('open');
+        }
+    });
+
+    // Handle option selection
+    options.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            const text = this.textContent;
+
+            // Update hidden input
+            hiddenInput.value = value;
+
+            // Update display text
+            selectText.textContent = text;
+
+            // Update selected state
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+
+            // Close dropdown
+            customSelect.classList.remove('open');
+
+            // Trigger change event for compatibility
+            const event = new Event('change', { bubbles: true });
+            hiddenInput.dispatchEvent(event);
+        });
+    });
+
+    // Initialize with first option selected
+    if (options.length > 0) {
+        options[0].classList.add('selected');
     }
 }
 

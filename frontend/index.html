@@ -63,15 +63,22 @@
                             </div>
                         </div>
                         <div class="control-row">
-                            <label>
-                                Deontoloji variant:
-                                <select id="deon-variant">
-                                    <option value="protect_children">Uşaqları qorumaq</option>
-                                    <option value="non_intervention">Müdaxilə etmə</option>
-                                    <option value="protect_innocent">Günahsızları qorumaq</option>
-                                    <option value="protect_vulnerable">Zəif qrupları qorumaq</option>
-                                </select>
-                            </label>
+                            <span class="control-label">Deontoloji variant:</span>
+                            <div class="custom-select-wrapper">
+                                <div class="custom-select" id="deon-variant-select">
+                                    <div class="custom-select-trigger">
+                                        <span class="custom-select-text">Uşaqları qorumaq</span>
+                                        <div class="custom-select-arrow">▼</div>
+                                    </div>
+                                    <div class="custom-options">
+                                        <div class="custom-option" data-value="protect_children">Uşaqları qorumaq</div>
+                                        <div class="custom-option" data-value="non_intervention">Müdaxilə etmə</div>
+                                        <div class="custom-option" data-value="protect_innocent">Günahsızları qorumaq</div>
+                                        <div class="custom-option" data-value="protect_vulnerable">Zəif qrupları qorumaq</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="deon-variant" value="protect_children">
+                            </div>
                         </div>
                         <div class="control-row manual-choice-row">
                             <span>Şəxsi qərarın:</span>
@@ -370,7 +377,7 @@
     </main>
 
     <footer class="app-footer">
-        <small>Tramvay Dilemması – lokal backend: http://127.0.0.1:5000</small>
+        <small>&copy; Ayan Gafarli 2025</small>
     </footer>
 
     <script src="script.js"></script>
