@@ -1,7 +1,14 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from ai_model import decide_scenario, decide_scenario_v2
+
+# Lokalda və serverdə işləmək üçün dual import:
+# - Lokalda: python app.py (backend qovluğundan işlədirsən)
+# - Serverdə: gunicorn backend.app:app (backend package kimi)
+try:
+    from .ai_model import decide_scenario, decide_scenario_v2
+except ImportError:
+    from ai_model import decide_scenario, decide_scenario_v2
 
 # Sadə yaddaşdaxili statistika
 STATS = {
@@ -9,22 +16,20 @@ STATS = {
     "total_ai_agreements": 0
 }
 
-# ==== FRONTEND QOVLUĞUNUN YOLU ====
-# Bu fayl backend/app.py içindədir.
-# Frontend isə ../frontend qovluğundadır.
+# FRONTEND qovluğunun yolu (../frontend)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
 
-# Flask tətbiqi: static_folder olaraq frontend qovluğunu göstəririk
+# Flask tətbiqi: frontend qovluğunu static kimi göstəririk
 app = Flask(
     __name__,
-    static_folder=FRONTEND_DIR,  # index.html, script.js, styles.css buradadır
-    static_url_path=""           # fayllar birbaşa /index.html, /script.js kimi çıxacaq
+    static_folder=FRONTEND_DIR,
+    static_url_path=""
 )
 CORS(app)  # Enable CORS for frontend requests
 
 
-# ================== FRONTEND ROUTE ==================
+# ============== FRONTEND ROUTE ==============
 
 @app.route("/")
 def index():
@@ -34,7 +39,7 @@ def index():
     return app.send_static_file("index.html")
 
 
-# ================== API ENDPOINT-LƏRİ ==================
+# ============== API ENDPOINT-LƏRİ ==============
 
 @app.route('/decide', methods=['POST'])
 def decide():

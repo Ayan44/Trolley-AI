@@ -1,4 +1,4 @@
- const API_BASE = window.location.origin;
+const API_BASE = "";
 
 
 // Default weights for custom mode (same as backend)
