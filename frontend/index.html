@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8" />
+    <title>Trolley AI – Etik Simulyator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-main">
+            <div class="logo-area">
+                <div class="logo-icon">🚋</div>
+                <div>
+                    <h1>Trolley AI</h1>
+                    <p>Tramvay Dilemması: AI ilə Etik Qərarlarınızı Test Edin</p>
+                </div>
+            </div>
+        </div>
+        <nav class="top-nav">
+            <button class="tab-btn active" data-tab="info">Info</button>
+            <button class="tab-btn" data-tab="sim">Simulyasiya</button>
+            <button class="tab-btn" data-tab="history">Tarixçə</button>
+        </nav>
+    </header>
+
+    <main class="app-main">
+        <!-- SIMULYASİYA TABI -->
+        <section id="sim-view" class="tab-view">
+            <!-- Top Row: Track 1 | Scene | Track 2 -->
+            <div class="top-row">
+                <!-- Left: TRACK 1 Panel -->
+                <section class="panel track-panel" id="track1-panel">
+                    <h2>RELS 1</h2>
+                    <ul id="track1-list" class="person-list"></ul>
+                </section>
+
+                <!-- Center: Scene Panel -->
+                <section class="panel scene-panel">
+                    <h2>Tramvay Səhnəsi</h2>
+                    <div id="trolley-board"></div>
+                    <div class="scene-controls">
+                        <div class="control-row">
+                            <span class="control-label">Rejim:</span>
+                            <div class="pill-group">
+                                <label class="pill">
+                                    <input type="radio" name="mode-radio" value="utilitarian" checked />
+                                    <span>Utilitarian</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="radio" name="mode-radio" value="deontological" />
+                                    <span>Deontoloji</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="radio" name="mode-radio" value="custom" />
+                                    <span>Custom</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="radio" name="mode-radio" value="ml" />
+                                    <span>ML</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <label>
+                                Deontoloji variant:
+                                <select id="deon-variant">
+                                    <option value="protect_children">Uşaqları qorumaq</option>
+                                    <option value="non_intervention">Müdaxilə etmə</option>
+                                    <option value="protect_innocent">Günahsızları qorumaq</option>
+                                    <option value="protect_vulnerable">Zəif qrupları qorumaq</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="control-row manual-choice-row">
+                            <span>Şəxsi qərarın:</span>
+                            <div class="pill-group">
+                                <button class="btn btn-outline" data-manual="1">Rels 1</button>
+                                <button class="btn btn-outline" data-manual="2">Rels 2</button>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <span id="manual-choice-label" class="manual-label">Hələ seçim etməmisən</span>
+                        </div>
+                        <button id="run-single-btn" class="btn btn-primary run-button">
+                            QƏRARI VER
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Right: TRACK 2 Panel -->
+                <section class="panel track-panel" id="track2-panel">
+                    <h2>RELS 2</h2>
+                    <ul id="track2-list" class="person-list"></ul>
+                </section>
+            </div>
+
+            <!-- Bottom Row: Result | Stats | Compare -->
+            <div class="bottom-row">
+                <!-- Left: RESULT Panel -->
+                <section class="panel bottom-panel" id="result-panel">
+                    <h2>NƏTİCƏ</h2>
+                    <div id="single-result-container" class="results-container">
+                        <p class="placeholder-text">
+                            Scenario qur və "RUN DECISION" düyməsinə bas.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Center: STATS Panel -->
+                <section class="panel bottom-panel" id="stats-panel">
+                    <h2>STATİSTİKA</h2>
+                    <div class="stats-content">
+                        <p id="stats-summary" class="placeholder-text">
+                            Statistika üçün əvvəl yuxarıdan Track 1 və ya Track 2-ni öz qərarın kimi seç.
+                            Sonra müqayisə etdikcə AI ilə nə qədər üst-üstə düşdüyünü burada görəcəksən.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Right: COMPARE Panel -->
+                <section class="panel bottom-panel" id="compare-panel">
+                    <h2>MÜQAYİSƏ</h2>
+                    <div class="compare-controls">
+                        <div class="control-row">
+                            <span class="control-label">Müqayisəyə daxil olacaqlar:</span>
+                            <div class="pill-group">
+                                <label class="pill">
+                                    <input type="checkbox" class="compare-mode" value="utilitarian" checked />
+                                    <span>Utilitarian</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="checkbox" class="compare-mode" value="deontological" checked />
+                                    <span>Deontoloji</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="checkbox" class="compare-mode" value="custom" />
+                                    <span>Custom</span>
+                                </label>
+                                <label class="pill">
+                                    <input type="checkbox" class="compare-mode" value="ml" checked />
+                                    <span>ML</span>
+                                </label>
+                            </div>
+                        </div>
+                        <button id="run-compare-btn" class="btn">
+                            MÜQAYISƏ ET
+                        </button>
+                    </div>
+                    <div id="compare-results-container" class="results-container">
+                        <p class="placeholder-text">
+                            Müqayisə rejimində nəticə görmək üçün modları seçib "MÜQAYISƏ ET" düyməsini sıx.
+                        </p>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <!-- TARİXÇƏ TABI -->
+        <section id="history-view" class="tab-view">
+            <section class="panel history-panel">
+                <h2>Tarixçə</h2>
+                <p class="panel-subtitle">
+                    Burada son ssenarilər, seçimlərin və AI-nin qərarları xülasə şəklində görünəcək.
+                </p>
+                <div id="history-list" class="history-list">
+                    <p class="placeholder-text">
+                        Hələ heç bir ssenari oynanmamış kimi görünür. Simulyasiya tabında bir neçə test et,
+                        burada avtomatik qeyd olunacaq.
+                    </p>
+                </div>
+            </section>
+        </section>
+
+        <!-- INFO TABI -->
+        <section id="info-view" class="tab-view active">
+            <div class="info-container">
+                <!-- Section 1: What is this app for? -->
+                <section class="info-card">
+                    <h3>Bu sayt nə üçündür?</h3>
+                    <p>
+                        Bu sayt klassik <strong>"Tramvay Dilemması"</strong> etik dilemma-sının interaktiv simulyatorudur. Tramvay Dilemması filosof Philippa Foot tərəfindən irəli sürülmüş bir düşüncə eksperimenti olub, etik qərarvermə prosesini araşdırır.
+                    </p>
+
+                    <h4>Nədir Tramvay Dilemması?</h4>
+                    <p>
+                        Bir tramvay sürətlə irəliləyir və qarşısında 5 nəfər dayanmışdır. Siz lever-ə toxunaraq tramvayı başqa relsə yönləndirə bilərsiniz, amma orada da 1 nəfər var. Nə edərsiniz?
+                    </p>
+                    <ul>
+                        <li>5 nəfəri xilas etmək üçün 1 nəfəri qurban vermək?</li>
+                        <li>Yoxsa passiv qalmaq və 5 nəfərin ölümü?</li>
+                        <li>Hər qərarın etik nəticələri nədir?</li>
+                    </ul>
+
+                    <h4>Bu saytda nə edə bilərsiniz?</h4>
+                    <p>
+                        Bu interaktiv alət vasitəsilə öz etik qərarlarınızı test edə və müxtəlif etik modellərlə müqayisə edə bilərsiniz:
+                    </p>
+                    <ul>
+                        <li><strong>Scenario qurmaq:</strong> Track 1 və Track 2-də müxtəlif tipli insanlar yerləşdirin (uşaqlar, həkimlər, cinayətkarlar, qocalar və s.)</li>
+                        <li><strong>Etik modları sınamaq:</strong> Utilitarian, Deontoloji, Custom və ML modları ilə qərarları gör</li>
+                        <li><strong>Öz qərarınızı qeyd etmək:</strong> Hər scenario üçün öz seçiminizi göstərin</li>
+                        <li><strong>Müqayisə etmək:</strong> Bütün modların qərarlarını yan-yana müqayisə edin</li>
+                        <li><strong>Statistika toplamaq:</strong> Uzun müddətdə Süni İntellekt ilə nə qədər uyğunlaşdığınızı izləyin</li>
+                    </ul>
+
+                    <h4>Niyə vacibdir?</h4>
+                    <p>
+                        Bu alət etik düşüncə tərzinizi başa düşməyə kömək edir:
+                    </p>
+                    <ul>
+                        <li>Fərqli etik yanaşmaları (utilitarian vs deontoloji) müqayisə edin</li>
+                        <li>Real dünya qərarlarında hansı prinsiplərə üstünlük verdiyinizi öyrənin</li>
+                        <li>Süni İntellekt sistemlərinin etik qərarvermə mexanizmlərini anlayın</li>
+                        <li>Etik dilemma-ların çətinliyini praktiki şəkildə hiss edin</li>
+                    </ul>
+
+                    <h4>Təhsil və əyləncə üçün</h4>
+                    <p>
+                        Bu alət həm təhsil, həm də əyləncə məqsədi daşıyır. Etik fəlsəfə dərslərində, AI etikası müzakirələrində və ya sadəcə maraq üçün istifadə edilə bilər.
+                    </p>
+                </section>
+
+                <!-- Section 2: Ethical modes -->
+                <section class="info-card">
+                    <h3>Etik modlar</h3>
+                    <p>
+                        Saytda dörd əsas etik mod mövcuddur. Hər biri fərqli prinsiplərə əsaslanır. Aşağıda hər modun necə işlədiyi ətraflı izah olunur.
+                    </p>
+
+                    <h4>Utilitarian mod</h4>
+                    <p>
+                        Bu mod "ümumi etik dəyər itkisini minimuma endirməyə" çalışır. Sistemdə yaş (AGE_WEIGHTS), rol (ROLE_WEIGHTS) və atribut (FLAG_WEIGHTS) üçün ağırlıqlar cəmlənib, hər rels üçün "loss" (itki) hesablanır. Az itki olan rels qurban verilir.
+                    </p>
+                    <ul>
+                        <li><strong>Yaş ağırlıqları:</strong> Uşaq (4), Yeniyetmə/Gənc (3), Böyük (2), Qoca (1)</li>
+                        <li><strong>Rol ağırlıqları:</strong> Həkim (4), Tibb bacısı (3), Müəllim (3), Mühəndis (2), Tələbə (2), İşsiz (1), Təqaüdçü (1), Cinayətkar (-1), Oğru (0)</li>
+                        <li><strong>Atribut ağırlıqları:</strong>Əlil (2), Günahsız (1), Günahkar (-2), Qanun pozucu (-1), Qohum (2), Hamilə (3), Dost (1), Tanış olmayan (0), Həyat xilas edən (2), Zəif qrup (2)</li>
+                    </ul>
+
+                    <h4>Deontoloji mod</h4>
+                    <p>
+                        Fərqli variantları var. Hər variant müəyyən qaydalara əsaslanır. Əgər deontoloji qaydalar qərar verə bilmirsə (məsələn, hər iki tərəf eyni prioritetə malikdirsə), sistem <strong>utilitarian fallback</strong> istifadə edir – yəni etik dəyər itkisinə baxaraq daha az itki olan track-i qurban verir.
+                    </p>
+                    <ul>
+                        <li><strong>non_intervention:</strong> Müdaxilə etmə – tramvay mövcud istiqamətdə gedir (Rels 1)</li>
+                        <li><strong>protect_children:</strong> Uşaqlar olan relsi qurban verməməyə çalışır, yalnız hər iki tərəf eyni vəziyyətdədirsə utilitar fallback istifadə edilir</li>
+                        <li><strong>protect_innocent:</strong> Günahsızları qorumaq – günahkarların olduğu rels qurban verilir</li>
+                        <li><strong>protect_vulnerable:</strong> Zəif qrupları qorumaq – hamilə, əlil və zəif şəxslərin olduğu rels qurban verilmir</li>
+                    </ul>
+
+                    <h4>Custom mod</h4>
+                    <p>
+                        İstifadəçi öz ağırlıqlarını verir (yaş, rol, atributlar üçün prioritet). Sistem default ağırlıqlarla bunları birləşdirir və sonda yenə "loss" hesablayır. Öz etik dəyərlərinizi rəqəmsal şəkildə modelləşdirə bilərsiniz.
+                    </p>
+
+                    <h4>ML mod</h4>
+                    <p>
+                        Bu mod əvvəlcədən öyrədilmiş modeldən (Maşın Öyrənmə) istifadə edir və sənin keçmiş seçimlərinə əsasən qərar verir. Model Təsadüfi Meşə alqoritmi ilə 200-dən çox tramvay dilemması ssenarisindən öyrənib. Yaş, rol və atribut məlumatlarını təhlil edərək qərar verir.
+                    </p>
+                </section>
+
+                <!-- Section 3: Custom rules -->
+                <section class="info-card">
+                    <h3>Custom qaydalar (prioritetlər necə işləyir)</h3>
+                    <p>
+                        Sadə izah: hər yaş qrupunun, rolun və atributun rəqəmsal dəyəri var. Bu dəyərlər toplanır → həmin track-də "itirilən etik dəyər" alınır. Custom modda bu rəqəmləri dəyişməklə öz etik baxışını modelləşdirirsən.
+                    </p>
+
+                    <h4>Nümunə hesablamalar:</h4>
+                    <div style="background-color: #f5f5f5; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                        <p style="color: #000;"><strong>Böyük + Həkim + Günahsız:</strong> 2 (böyük) + 4 (həkim) + 1 (günahsız) = 7 (yüksək dəyər)</p>
+                        <p style="color: #000;"><strong>Cinayətkar:</strong> -1 (cinayətkar rol) + (-2) (günahkar) = -3 (mənfi/aşağı dəyər)</p>
+                    </div>
+
+                    <p>Custom modda bu rəqəmləri dəyişməklə öz etik baxışını modelləşdirirsən. Məsələn, əgər uşaqlara daha çox qiymət versən, onların ağırlığını artır.</p>
+                </section>
+
+                <!-- Section 4: Compare & Stats -->
+                <section class="info-card">
+                    <h3>Müqayisə necə işləyir</h3>
+                    <p>
+                        İstifadəçi bir ssenari qurur, sonra Müqayisə düyməsi bir neçə modu paralel hesablayır. Müqayisə panelində hər mod üçün hansı rels seçildiyi yan-yana göstərilir. Şəxsi seçiminiz varsa, o da müqayisəyə daxil olunur.
+                    </p>
+                    <p><strong>Müqayisə-də mövcud olan modlar:</strong></p>
+                    <ul>
+                        <li><strong>Utilitarian:</strong> Həmişə daxil olur</li>
+                        <li><strong>Deontoloji:</strong> Seçilmiş variant ilə</li>
+                        <li><strong>Custom:</strong> Default utilitarian qaydaları ilə işləyir</li>
+                        <li><strong>Maşın Öyrənmə:</strong> Maşın öyrənmə model aktivdirsə</li>
+                        <li><strong>Şəxsi:</strong> Sizin öz qərarınız (əgər seçmisinizsə)</li>
+                    </ul>
+                    <p><strong>Sadə axın:</strong></p>
+                    <ol>
+                        <li>Rels-lərə insanların yerləşdirilməsi</li>
+                        <li>Şəxsi qərarınızı seçin (Rels 1 və ya Rels 2)</li>
+                        <li>Müqayisəyə daxil olmaq istədiyiniz modları seçin</li>
+                        <li>Müqayisə çağırışı</li>
+                        <li>Hər modun cavabı və sənin şəxsi seçiminlə müqayisə</li>
+                    </ol>
+
+                    <h4>Statistika necə işləyir</h4>
+                    <p>
+                        İstifadəçi şəxsi olaraq "mən Rels 1/2-ni seçərdim" deyəndə bu qərar yadda saxlanılır. Hər müqayisə icrasında, əgər ən azı bir Süni İntellekt mod sənin seçiminlə eyni rels-i seçirsə, bu "razılıq" sayılır.
+                    </p>
+                    <p>Statistika panelində göstərilir:</p>
+                    <ul>
+                        <li>Neçə ssenari üçün şəxsi qərar vermisən</li>
+                        <li>Neçəsində Süni İntellekt səninlə razı olub</li>
+                        <li>Ümumi razılıq faizi</li>
+                    </ul>
+                </section>
+
+                <!-- Section 5: ML mode and manual decision -->
+                <section class="info-card">
+                    <h3>Maşın Öyrənmə mod detalları</h3>
+                    <p>
+                        Maşın Öyrənmə modu əvvəlcədən öyrədilmiş Təsadüfi Meşə modeli istifadə edir. Model 200-dən çox süni yaradılmış tramvay dilemması ssenarisindən öyrənib. Hər ssenari üçün yaş, rol və atribut sayılarını analiz edərək qərar verir (seçilmiş_rels = 1 və ya 2).
+                    </p>
+                    <p>Model xüsusiyyətləri:</p>
+                    <ul>
+                        <li>Rels 1-də uşaq, böyük, qoca sayı</li>
+                        <li>Rels 2-də uşaq, böyük, qoca sayı</li>
+                        <li>Rol və atribut sayları (həkim, günahsız, günahkar və s.)</li>
+                    </ul>
+
+                    <h4>Şəxsi qərar</h4>
+                    <p>
+                        Şəxsi qərar seçimi statistika üçün vacibdir. "Rels 1" və ya "Rels 2" seçəndə sistem bunu yadda saxlayır və gələcək müqayisə əməliyyatlarında Süni İntellekt ilə müqayisə edir.
+                    </p>
+                </section>
+
+                <!-- Section 6: How to use -->
+                <section class="info-card">
+                    <h3>Necə istifadə etmək olar? (Kiçik istifadə bələdçisi)</h3>
+                    <p>
+                        Addım-addım qısa bələdçi:
+                    </p>
+                    <ol>
+                        <li>Soldakı və sağdakı Rels panellərindən insan tiplərini seç və əlavə et</li>
+                        <li>Ortadakı səhnədə tramvayın qarşısında kimlərin dayandığını gör</li>
+                        <li>Rejim seç → QƏRARI VER düyməsinə bas</li>
+                        <li>Tramvayın hansı relsə getdiyini və nəticəni oxu</li>
+                        <li>İstəsən, öz şəxsi qərarını seç və Müqayisə/Statistika ilə Süni İntellekt ilə müqayisə et</li>
+                    </ol>
+                </section>
+
+                <!-- Emoji Legend -->
+                <section class="info-card info-legend">
+                    <h3>📋 İkonlar və Emojilər</h3>
+                    <p>Saytda istifadə olunan simvollar:</p>
+                    <div class="legend-grid">
+                        <div class="legend-item"><span class="legend-emoji">👶</span> <span>Uşaq</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🧑</span> <span>Gənc / Cavan</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🧓</span> <span>Qoca</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🧑‍⚕️</span> <span>Həkim / Tibb bacısı</span></div>
+                        <div class="legend-item"><span class="legend-emoji">👩‍🏫</span> <span>Müəllim</span></div>
+                        <div class="legend-item"><span class="legend-emoji">👷</span> <span>Mühəndis</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🎓</span> <span>Tələbə / Şagird</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🚨</span> <span>Cinayətkar / Oğru</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🤰</span> <span>Hamilə</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🦽</span> <span>Əlil</span></div>
+                        <div class="legend-item"><span class="legend-emoji">👴</span> <span>Təqaüdçü</span></div>
+                        <div class="legend-item"><span class="legend-emoji">🧍</span> <span>İşsiz</span></div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <small>Tramvay Dilemması – lokal backend: http://127.0.0.1:5000</small>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
